@@ -3,11 +3,22 @@ import java.util.ArrayList;
 
 public class Board {
     public static final String ANSI_BLACK_BACKGROUND = "\u001B[40m";
+    public static final String BLACK_BOLD_BRIGHT = "\033[1;90m"; // BLACK
+    public static final String BLACK_BACKGROUND_BRIGHT = "\033[0;100m";// BLACK
+    public static final String BLACK_BOLD = "\033[1;30m";  // BLACK
+    public static final String ANSI_BLACK = "\u001B[30m";
+    public static final String ANSI_WHITE = "\u001B[37m";
+    public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_WHITE_BACKGROUND = "\u001B[47m";
+    public static final String WHITE_BOLD = "\033[1;97m"; // WHITE
+    public static final String ANSI_BLUE = "\u001B[34m";
 
     public static final String ANSI_GREEN_BACKGROUND = "\u001B[42m";
     public static final String ANSI_RESET = "\u001B[0m";
-    ArrayList livingPieces = new ArrayList<Piece>();
+    ArrayList<Piece> livingPieces = new ArrayList<Piece>();
+    ArrayList<Piece> whitePieces = new ArrayList<Piece>();
+    ArrayList<Piece> blackPieces = new ArrayList<Piece>();
+
     ArrayList deadPieces = new ArrayList<Piece>();
     ArrayList players = new ArrayList<Player>();
     int piecesRemaining;
@@ -16,21 +27,16 @@ public class Board {
         createBoard();
         printBoard();
         populateBoard();
-        printBoard();
-        /*
-        rook.printInfo();
-        board = rook.addPieceToBoard(board);
-        printBoard();
-        rook.move('Z', '1');
-        rook.printInfo();
-        */
+        updateBoard();
+    printBoard();
+
 
     }
     public void printBoard() {
         boolean coloured = false;
-        System.out.println(ANSI_GREEN_BACKGROUND + "  A B C D E F G H " + ANSI_RESET);
+        System.out.println(ANSI_GREEN_BACKGROUND + "  A  B  C  D  E  F  G  H  " + ANSI_RESET);
         int n = 8;
-        for (int i = 0; i < 8; i++) {
+        for (int r = 0; r < 8; r++) {
             if (coloured) {
                 System.out.print(ANSI_WHITE_BACKGROUND);
                 coloured = false;
@@ -38,19 +44,32 @@ public class Board {
                 System.out.print(ANSI_BLACK_BACKGROUND);
                 coloured = true;
             }
-            if (i == 7) {
+            if (r == 7) {
                 System.out.print(ANSI_RESET);
             }
             System.out.print(ANSI_GREEN_BACKGROUND + n + " ");
-            for (int j = 0; j < 8; j++) {
+            for (int c = 0; c < 8; c++) {
                  if (coloured) {
                     System.out.print(ANSI_WHITE_BACKGROUND);
                     coloured = false;
                 } else {
-                    System.out.print(ANSI_BLACK_BACKGROUND);
+                    System.out.print(BLACK_BACKGROUND_BRIGHT);
                     coloured = true;
                 }
-                System.out.print(board[i][j] + " ");
+
+                    if (board[r][c] == ' ') {
+                        System.out.print(board[r][c] + "  ");
+                    } else {
+                        printPiece(r,c);
+                    }
+
+
+
+                    System.out.print(ANSI_RESET);
+
+
+
+
                 System.out.print(ANSI_RESET);
             }
             n--;
@@ -59,8 +78,23 @@ public class Board {
         }
     }
 
+    public void printPiece(int r, int c){
+        for (Piece whitePiece : whitePieces) {
+            if (convertRow(whitePiece.getrPos()) == r && convertColumn(whitePiece.getcPos()) == c) {
+                System.out.print(WHITE_BOLD + whitePiece.getType() + "  ");
+                break;
+            }
+        }
+        for (Piece blackPiece : blackPieces) {
+            if (convertRow(blackPiece.getrPos()) == r && convertColumn(blackPiece.getcPos()) == c) {
+                System.out.print(BLACK_BOLD + blackPiece.getType() + "  ");
+                break;
+            }
+        }
+    }
+
     private void createBoard() {
-        board = new char[10][10];
+        board = new char[8][8];
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 board[i][j] = ' ';
@@ -70,8 +104,18 @@ public class Board {
 
     }
 
+
+
     private void populateBoard() {
-        Rook rook = new Rook(board,'A','1', false);
+        whitePieces.add(new Rook(board,'A','1', false));
+        whitePieces.add(new Rook(board,'H','1', false));
+        whitePieces.add(new Bishop(board, 'B', '1', false));
+        whitePieces.add(new Bishop(board, 'G', '1', false));
+        blackPieces.add(new Rook(board,'A','8', true));
+        blackPieces.add(new Rook(board,'H','8', true));
+        blackPieces.add(new Bishop(board, 'B', '8', true));
+        blackPieces.add(new Bishop(board, 'G', '8', true));
+
     }
     public ArrayList getLivingPieces() {
         return livingPieces;
@@ -84,6 +128,7 @@ public class Board {
     public ArrayList getDeadPieces() {
         return deadPieces;
     }
+
 
     public void setDeadPieces(ArrayList deadPieces) {
         this.deadPieces = deadPieces;
@@ -113,6 +158,65 @@ public class Board {
         this.board = board;
     }
 
+    public ArrayList<Piece> getWhitePieces() {
+        return whitePieces;
+    }
+
+    public void setWhitePieces(ArrayList<Piece> whitePieces) {
+        this.whitePieces = whitePieces;
+    }
+
+    public ArrayList<Piece> getBlackPieces() {
+        return blackPieces;
+    }
+
+    public void setBlackPieces(ArrayList<Piece> blackPieces) {
+        this.blackPieces = blackPieces;
+    }
+
+    /*reads in the two piece arrays and adds their letters and current positions to the board*/
+    public void updateBoard() {
+        //reset board before adding new pieces
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                board[r][c] = ' ';
+            }
+        }
+
+        for (Piece blackPiece : blackPieces) {
+            int c = convertColumn(blackPiece.getcPos());
+            int r = convertRow(blackPiece.getrPos());
+            board[r][c] = blackPiece.getType();
+        }
+        for (Piece whitePiece : whitePieces) {
+            int c = convertColumn(whitePiece.getcPos());
+            int r = convertRow(whitePiece.getrPos());
+            board[r][c] = whitePiece.getType();
+        }
+    }
+
+    public int convertColumn(char x) {
+       //System.out.println(x + "->" + (x - 65));
+        return x - 65;
+    }
+
+    public int convertRow(char y) {
+      //System.out.println(y + "->" + ( 8 - (y - '0')));
+        return 8 - (y - '0');
+    }
+    public void printArray() {
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                if (board[r][c] == ' ') {
+                    System.out.print('#');
+                } else {
+                    System.out.print(board[r][c]);
+                }
+            }
+            System.out.println();
+        }
+
+    }
 
 
 
