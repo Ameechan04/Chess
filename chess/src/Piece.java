@@ -2,19 +2,20 @@ import java.util.ArrayList;
 
 public abstract class Piece {
     public char type;
+    public char id;
     private boolean alive;
-    private boolean colour;
+    private String colour;
     private char rPos;
     private char cPos;
     private int value;
 
-    public Piece(char[][] board, char c, char r, boolean black, char type) {
+    public Piece(char c, char r, String colour, char type, char id) {
+        this.id = id;
         this.type = type;
         setAlive(true);
         this.cPos = c;
         this.rPos = r;
-        setColour(black);
-       // addPieceToBoard(board);
+        setColour(colour);
 
     }
 
@@ -33,8 +34,11 @@ public abstract class Piece {
 
 
 
-    public boolean killed() {
-        return false;
+    public boolean killed(ArrayList<Piece> arr, int index) {
+        System.out.println(this.getColour() + " " + this.getType() + " has been killed");
+        this.setAlive(false);
+        arr.remove(index);
+        return true;
     }
 
 
@@ -47,11 +51,11 @@ public abstract class Piece {
         this.alive = alive;
     }
 
-    public boolean getColour() {
+    public String getColour() {
         return colour;
     }
 
-    public void setColour(boolean colour) {
+    public void setColour(String colour) {
         this.colour = colour;
     }
 
@@ -79,12 +83,21 @@ public abstract class Piece {
         this.value = value;
     }
 
+    public char getId() {
+        return id;
+    }
+
+    public void setId(char id) {
+        this.id = id;
+    }
+
     public void printInfo() {
 
         System.out.println(type + " " + value + " alive: " + alive + " black: " + colour + " Position: " + cPos + rPos) ;
     }
 
     public boolean moveOnGrid(char c, char r) {
+
         if (c >= 'A' && c <= 'H' && r >= '1' && r <= '8') {
             return true;
         }
@@ -93,39 +106,101 @@ public abstract class Piece {
     }
 
 
-    public boolean checkEmptySpot(ArrayList<Piece> whitePieces, ArrayList<Piece> blackPieces, char moveToC, char moveToR) {
-        for (int i = 0; i < whitePieces.size(); i++) {
-            if (whitePieces.get(i).getcPos() == moveToC && whitePieces.get(i).getrPos() == moveToR ) {
-                if (this.getColour()) { //if colour = true aka it is black
-                    removeFromList(whitePieces, i);
-                    return true;
-                } else { //if it is white and trying to move where a white piece already is
-                    System.out.println("The space is already occupied by one of your pieces!");
+
+    public boolean isSpotEmpty(ArrayList<Piece> whitePieces, ArrayList<Piece> blackPieces, char moveToC, char moveToR) {
+        for (Piece whitePiece:whitePieces) {
+            if (whitePiece.getrPos() == moveToR && whitePiece.getcPos() == moveToC) {
+                return false;
+            }
+        }
+        for (Piece blackPiece:blackPieces) {
+            if (blackPiece.getrPos() == moveToR && blackPiece.getcPos() == moveToC) {
+                return false;
+            }
+        }
+        return true;
+
+
+    }
+
+
+    public boolean checkRowAbove(ArrayList<Piece> arr, char r, char c) {
+        for (Piece p: arr) {
+             if (p.getcPos() == c) {
+                if (this.getrPos() < p.getrPos() && r > p.getrPos()) {
+                    System.out.println("The movement is blocked as a piece is above it");
                     return false;
                 }
             }
         }
-        for (int i = 0; i < blackPieces.size(); i++) {
-            if (blackPieces.get(i).getcPos() == moveToC && blackPieces.get(i).getrPos() == moveToR ) {
-                if (!(this.getColour())) { //if colour = false aka it is white
-                    removeFromList(blackPieces, i);
-                    return true;
-                } else { //if it is black and trying to move where a black piece already is
-                    System.out.println("The space is already occupied by one of your pieces!");
+        return true;
+    }
+    public boolean checkRowBelow(ArrayList<Piece> arr, char r, char c) {
+        for (Piece p: arr) {
+            if (p.getcPos() == c) {
+                if (this.getrPos() > p.getrPos() && r < p.getrPos()) {
+                    System.out.println("The movement is blocked as a piece is below it");
                     return false;
                 }
             }
         }
-        return true; //if it has reached here the spot is empty
-
+        return true;
     }
 
-    public ArrayList<Piece> removeFromList(ArrayList<Piece> pieces, int index) {
-        System.out.println("The " + this.type + " has killed the " + pieces.get(index).getType());
-        pieces.remove(index);
-        return pieces;
-
+    public boolean checkColumnRight(ArrayList<Piece> arr, char r, char c) {
+        for (Piece p: arr) {
+            //if same row
+            if (p.getrPos() == r) {
+                //if our current column is left of the piece and our destination is to its right
+                if (this.getcPos() < p.getcPos() && c > p.getcPos()) {
+                    System.out.println("The movement is blocked as a piece is in the way on the right");
+                    return false;
+                }
+            }
+        }
+        return true;
     }
+    public boolean checkColumnLeft(ArrayList<Piece> arr, char r, char c) {
+        for (Piece p: arr) {
+            //if same row
+            if (p.getrPos() == r) {
+                //if our current column is left of the piece and our destination is to its right
+                if (this.getcPos() > p.getcPos() && c < p.getcPos()) {
+                    System.out.println("The movement is blocked as a piece is in the way on the left");
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public boolean checkDiagonalUpperRight(ArrayList<Piece> arr, char r, char c) {
+        for (Piece p: arr) {
+            //if same row
+            if (p.getrPos() == r) {
+                //if our current column is left of the piece and our destination is to its right
+                if (this.getcPos() > p.getcPos() && c < p.getcPos()) {
+                    System.out.println("The movement is blocked as a piece is in the way on the left");
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public boolean checkIsDiagonal(char r, char c) {
+
+        if (Math.abs(c - this.getcPos()) == Math.abs(r - this.getrPos())) {
+            System.out.println("Diagonal is valid");
+            return true;
+        }
+        System.out.println("invalid diagonal");
+        return false;
+    }
+
+
+
+
 
 
 

@@ -2,9 +2,9 @@ public class Player {
 
 
     String name;
-    boolean colour;
+    String colour;
 
-    public Player(String name, boolean colour) {
+    public Player(String name, String colour) {
         this.name = name;
         this.colour = colour;
 
@@ -18,12 +18,17 @@ public class Player {
         this.name = name;
     }
 
-    public boolean isColour() {
+    public String getColour() {
         return colour;
     }
 
-    public void setColour(boolean colour) {
+    public void setColour(String colour) {
         this.colour = colour;
+    }
+
+    public void printDetails(){
+        System.out.println(getName() + ": " + getColour() + ", YOUR TURN");
+
     }
 
 

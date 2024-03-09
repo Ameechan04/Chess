@@ -25,10 +25,10 @@ public class Board {
     char[][] board;
     public Board() {
         createBoard();
-        printBoard();
+        //printBoard();
         populateBoard();
         updateBoard();
-    printBoard();
+    //printBoard();
 
 
     }
@@ -57,20 +57,13 @@ public class Board {
                     coloured = true;
                 }
 
-                    if (board[r][c] == ' ') {
-                        System.out.print(board[r][c] + "  ");
-                    } else {
-                        printPiece(r,c);
-                    }
-
-
-
-                    System.out.print(ANSI_RESET);
-
-
-
-
-                System.out.print(ANSI_RESET);
+                 if (board[r][c] == ' ') {
+                     System.out.print(board[r][c] + "  ");
+                 } else {
+                     printPiece(r,c);
+                 }
+                 System.out.print(ANSI_RESET);
+                 System.out.print(ANSI_RESET);
             }
             n--;
             System.out.println();
@@ -81,13 +74,14 @@ public class Board {
     public void printPiece(int r, int c){
         for (Piece whitePiece : whitePieces) {
             if (convertRow(whitePiece.getrPos()) == r && convertColumn(whitePiece.getcPos()) == c) {
-                System.out.print(WHITE_BOLD + whitePiece.getType() + "  ");
+
+                    System.out.print(WHITE_BOLD + " " + whitePiece.getType() + " ");
                 break;
             }
         }
         for (Piece blackPiece : blackPieces) {
             if (convertRow(blackPiece.getrPos()) == r && convertColumn(blackPiece.getcPos()) == c) {
-                System.out.print(BLACK_BOLD + blackPiece.getType() + "  ");
+                System.out.print(BLACK_BOLD + " " + blackPiece.getType() + " ");
                 break;
             }
         }
@@ -107,14 +101,38 @@ public class Board {
 
 
     private void populateBoard() {
-        whitePieces.add(new Rook(board,'A','1', false));
-        whitePieces.add(new Rook(board,'H','1', false));
-        whitePieces.add(new Bishop(board, 'B', '1', false));
-        whitePieces.add(new Bishop(board, 'G', '1', false));
-        blackPieces.add(new Rook(board,'A','8', true));
-        blackPieces.add(new Rook(board,'H','8', true));
-        blackPieces.add(new Bishop(board, 'B', '8', true));
-        blackPieces.add(new Bishop(board, 'G', '8', true));
+        whitePieces.add(new Rook('A','1', "white", '1'));
+
+        whitePieces.add(new Rook('H','1', "white", '2'));
+        whitePieces.add(new Bishop('B', '1', "white",'1'));
+        whitePieces.add(new Bishop('G', '1', "white",'2'));
+        whitePieces.add(new Knight('C', '1', "white", '1'));
+        whitePieces.add(new Knight('F', '1', "white",'2'));
+        whitePieces.add(new King('E', '1', "white"));
+        whitePieces.add(new Queen('D', '1', "white",'1'));
+
+        blackPieces.add(new Rook('A','8', "black", '1'));
+        blackPieces.add(new Rook('H','8', "black",'2'));
+        blackPieces.add(new Bishop('B', '8', "black",'1'));
+        blackPieces.add(new Bishop('G', '8', "black",'2'));
+        blackPieces.add(new Knight('C', '8', "black",'1'));
+        blackPieces.add(new Knight('F', '8', "black",'2'));
+        blackPieces.add(new King('E', '8', "black"));
+        blackPieces.add(new Queen('D', '8', "black",'1'));
+
+       // blackPieces.add(new Rook('B','3', "black", '2'));
+
+        char currentChar = 'A';
+        char ID = '1';
+       for (int i = 0; i < 8; i++) {
+
+            whitePieces.add(new WhitePawn(currentChar, ID));
+            blackPieces.add(new BlackPawn(currentChar,ID));
+            currentChar = (char) (currentChar + 1);
+           ID = (char) (ID + 1);
+
+        }
+
 
     }
     public ArrayList getLivingPieces() {
