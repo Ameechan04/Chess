@@ -3,6 +3,7 @@ import java.util.Scanner;
 
 public class Game {
     static Scanner input;
+    public static final String ANSI_BLUE = "\u001B[34m";
     public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_RESET = "\u001B[0m";
     ArrayList<Player> players;
@@ -10,81 +11,194 @@ public class Game {
     /*black is represented as boolean true, white is boolean false*/
     Board board;
     public Game() {
-        players = new ArrayList<>();
-        players.add(new Player("User1", "white"));
-        players.add(new Player("User2", "black"));
-        turn = 1;
+        MainMenu();
+
+    }
+
+    public void MainMenu(){
+        printChess();
+        System.out.println(ANSI_BLUE +"Enter new for a new game, or exit");
+        System.out.print(ANSI_RESET);
+        String in;
+        boolean valid = false;
+
+        do {
+            in = (input.nextLine()).toUpperCase();
+
+            switch (in)  {
+                case "NEW":
+                    valid = true;
+                    players = new ArrayList<>();
+                    System.out.println(ANSI_BLUE +"Enter player 1's name: ");
+                    in = (input.nextLine());
+                    players.add(new Player(in, "white"));
+                    System.out.println(ANSI_BLUE +"Enter player 2's name: ");
+                    in = (input.nextLine());
+                    players.add(new Player(in, "black"));
+                    System.out.print(ANSI_RESET);
+                    newGame();
+                    break;
+                case "EXIT":
+                    valid = true;
+                    System.out.println("Goodbye.");
+                    System.exit(0);
+                    break;
+
+                default:
+                    System.out.println(ANSI_RED + "Enter new or exit!");
+                    valid = false;
+            }
+        } while (!valid);
 
 
-        newGame();
-     //  movePiece();
-      //  board.updateBoard();
-       // board.printBoard();
 
 
+    }
+
+    public void printChess(){
+        System.out.println("┏━━━┓┏┓━━━━━━━━━━━━━━\n" +
+                "┃┏━┓┃┃┃━━━━━━━━━━━━━━\n" +
+                "┃┃━┗┛┃┗━┓┏━━┓┏━━┓┏━━┓\n" +
+                "┃┃━┏┓┃┏┓┃┃┏┓┃┃━━┫┃━━┫\n" +
+                "┃┗━┛┃┃┃┃┃┃┃━┫┣━━┃┣━━┃\n" +
+                "┗━━━┛┗┛┗┛┗━━┛┗━━┛┗━━┛\n" +
+                "━━━━━━━━━━━━━━━━━━━━━\n" +
+                "━━━━━━━━━━━━━━━━━━━━━\n");
+
+        System.out.println("         _                                        \n" +
+                "|_ \\/   |_| _  _|  _ _       |V| _  _  _ |_  _  _ \n" +
+                "|_)/    | || |(_| | (/_\\^/   | |(/_(/_(_ | |(_|| |\n");
     }
 
     public static void main(String[] args) {
         input = new Scanner(System.in);
         Game game = new Game();
     }
-    public boolean movePiece(char C, char R, char type, String player) {
+    public boolean movePiece(Piece piece) {
+        String location;
+        boolean valid = false;
+        char C = '0';
+        char R = '0';
+
+        do {
+            System.out.println(ANSI_BLUE + "Enter where you want to move the " + piece.getColour() + " " + piece.getFname() + " e.g. A4");
+            location = input.nextLine();
+            System.out.print(ANSI_RESET);
+            if (location.length() == 2) {
+
+                    C = location.charAt(0);
+                R = location.charAt(1);
+
+                if (C < 'A' || C > 'H' || R < '1' || R > '8') {
+                    System.out.println(ANSI_RED + "The location entered must be from A to H, and from 1 to 8");
+                    valid = false;
+                } else {
+                    valid = true;
+                }
+
+            } else {
+                System.out.println(ANSI_RED + "The location was an invalid format: only enter the letter and the number");
+                valid = false;
+            }
+
+
+        } while (!valid);
         String in;
         char ID = 0;
-        if (type == 'P'|| type == 'R' ||type == 'B'|| type == 'K') {
-            System.out.println("Enter which " + type + " to move: ");
-            in = input.nextLine();
-            ID = in.charAt(0);
-        }
-        if (player.equals("white")) {
-          for (int i = 0; i < board.getWhitePieces().size(); i++){
-                if (board.getWhitePieces().get(i).getType() == type) {
-                  //  System.out.println("MATCH FOUND");
-                    if (board.getWhitePieces().get(i).getId() == ID) {
-                        return board.getWhitePieces().get(i).move(C,R,board.getWhitePieces(),board.getBlackPieces());
-                        //return true;
-                    }
+        int index = 0;
+        //match current piece with a piece in the arrays, we want to remove it, move it on the board and add it back
+        if (piece.getColour().equals("white")) {
+            for (Piece arrayP : board.getWhitePieces()) {
+                if (piece == arrayP) {
+                   // System.out.println("MATCH FOUND");
+                    break;
+                } else {
+                    index++;
                 }
-          }
-          System.out.println("An invalid piece was chosen as type");
-          return false;
-
-        } else { //not white player
-            for (int i = 0; i < board.getBlackPieces().size(); i++){
-                if (board.getBlackPieces().get(i).getType() == type) {
-                    //  System.out.println("MATCH FOUND");
-                    if (board.getBlackPieces().get(i).getId() == ID) {
-                        return board.getBlackPieces().get(i).move(C,R,board.getWhitePieces(),board.getBlackPieces());
-                    }
+            }
+        } else {
+            for (Piece arrayP : board.getBlackPieces()) {
+                if (piece == arrayP) {
+                   // System.out.println("MATCH FOUND");
+                    break;
+                } else {
+                    index++;
                 }
             }
         }
-        System.out.println("An invalid piece was chosen as type");
-        return false;
+
+
+
+        if (!piece.move(C,R,board.getWhitePieces(),board.getBlackPieces())) {
+            System.out.println("Move failed");
+            return false;
+        } else {
+
+            return true;
+        }
+
+
 
        }
 
-    public void nextTurn(String player) {
-
+    public void nextTurn(Player player) {
+        Piece piece = null;
+        boolean valid = false;
         turn++;
         boolean endTurn = false;
         String location;
+        char type = '0';
        do {
-            System.out.println("Enter the piece you want to move or type exit");
-           location = input.nextLine().toUpperCase();
-/*
-           if (location.equals("exit")) {
-               exit = true;
-           }
-           */
-           char type = location.charAt(0);
-            System.out.println("Enter where you want to move to CR");
-            location = input.nextLine();
+           do {
+               System.out.println(ANSI_BLUE + "Enter the location of the piece you want to move e.g A1");
+               System.out.print(ANSI_RESET);
+
+               location = input.nextLine().toUpperCase();
+
+               if (location.equals("EXIT")) {
+                   endTurn = true;
+                   break;
+               }
+
+               if (location.length() != 2) {
+                   System.out.println(ANSI_RED + "The location was an invalid format: only enter the letter and the number");
+                   valid = false;
+               }
+               char existingC = location.charAt(0);
+               char existingR = location.charAt(1);
+               if (existingC < 'A' || existingC > 'H' || existingR < '1' || existingR > '8') {
+                   System.out.println("Enter a column from A to H and a row from 1 to 8");
+                   System.out.print(ANSI_RESET);
+                   valid = false;
+               }
+               if (player.getColour().equals("white")) {
+                 for(Piece whiteP:board.getWhitePieces()){
+                   if (whiteP.getcPos() == existingC && whiteP.getrPos() == existingR) {
+                       piece = whiteP;
+                //       System.out.println("Moving the white " + piece.getFname() + ":");
+                       valid = true;
+                   }
+                 }
+               } else {
+                   for(Piece blackP:board.getBlackPieces()){
+                       if (blackP.getcPos() == existingC && blackP.getrPos() == existingR) {
+                           piece = blackP;
+//                           System.out.println("Moving the black " + piece.getFname() + ":");
+                           valid = true;
+                       }
+                   }
+
+               }
+               if (piece == null) {
+                   System.out.println(ANSI_RED + "Could not find a " + player.getColour() + " piece on the selected square!");
+                   System.out.print(ANSI_RESET);
+                   valid = false;
+               }
+           } while (!valid);
 
 
-            char C = location.charAt(0);
-            char R = location.charAt(1);
-            if (movePiece(C,R,type, player)) {
+
+            if (movePiece(piece)) {
                 endTurn = true;
            } else {
                 System.out.println("Something went wrong...");
@@ -97,15 +211,13 @@ public class Game {
     public void newGame() {
         boolean done = false;
         int who = 0;
-        System.out.println(ANSI_RED + "\uD83D\uDC51 CHESS \uD83D\uDC51 ") ;   // alternative way "CHESS");
-       System.out.println(ANSI_RESET);
         board = new Board();
 
         do {
             players.get(who).printDetails();
             board.printBoard();
-            nextTurn(players.get(who).getColour());
-            who = Math.abs(who - 1);
+            nextTurn(players.get(who));
+           // who = Math.abs(who - 1);
             board.updateBoard();
 
 

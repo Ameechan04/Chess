@@ -101,35 +101,32 @@ public class Board {
 
 
     private void populateBoard() {
-        whitePieces.add(new Rook('A','1', "white", '1'));
-
-        whitePieces.add(new Rook('H','1', "white", '2'));
-        whitePieces.add(new Bishop('B', '1', "white",'1'));
-        whitePieces.add(new Bishop('G', '1', "white",'2'));
-        whitePieces.add(new Knight('C', '1', "white", '1'));
-        whitePieces.add(new Knight('F', '1', "white",'2'));
+        whitePieces.add(new Rook('A','1', "white"));
+        whitePieces.add(new Rook('H','1', "white"));
+        whitePieces.add(new Knight('B', '1', "white"));
+        whitePieces.add(new Knight('G', '1', "white"));
+        whitePieces.add(new Bishop('C', '1', "white"));
+        whitePieces.add(new Bishop('F', '1', "white"));
         whitePieces.add(new King('E', '1', "white"));
-        whitePieces.add(new Queen('D', '1', "white",'1'));
+        whitePieces.add(new Queen('D', '1', "white"));
 
-        blackPieces.add(new Rook('A','8', "black", '1'));
-        blackPieces.add(new Rook('H','8', "black",'2'));
-        blackPieces.add(new Bishop('B', '8', "black",'1'));
-        blackPieces.add(new Bishop('G', '8', "black",'2'));
-        blackPieces.add(new Knight('C', '8', "black",'1'));
-        blackPieces.add(new Knight('F', '8', "black",'2'));
+        blackPieces.add(new Rook('A','8', "black"));
+        blackPieces.add(new Rook('H','8', "black"));
+       blackPieces.add(new Knight('B', '8', "black"));
+        blackPieces.add(new Knight('G', '8', "black"));
+        blackPieces.add(new Bishop('C', '8', "black"));
+        blackPieces.add(new Bishop('F', '8', "black"));
         blackPieces.add(new King('E', '8', "black"));
-        blackPieces.add(new Queen('D', '8', "black",'1'));
+        blackPieces.add(new Queen('D', '8', "black"));
 
        // blackPieces.add(new Rook('B','3', "black", '2'));
-
         char currentChar = 'A';
-        char ID = '1';
+
        for (int i = 0; i < 8; i++) {
 
-            whitePieces.add(new WhitePawn(currentChar, ID));
-            blackPieces.add(new BlackPawn(currentChar,ID));
+            whitePieces.add(new WhitePawn(currentChar));
+            blackPieces.add(new BlackPawn(currentChar));
             currentChar = (char) (currentChar + 1);
-           ID = (char) (ID + 1);
 
         }
 

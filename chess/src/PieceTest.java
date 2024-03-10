@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PieceTest {
     Board board = new Board();
-    Piece tester = new Rook('A', '1', "white",'1');
+    Piece tester = new Rook('A', '1', "white");
 
     @Test
     void testMoveOnBoard() {

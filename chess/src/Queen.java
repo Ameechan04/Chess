@@ -1,6 +1,5 @@
 public class Queen extends Piece{
-    public Queen (char c, char r, String colour, char ID) {
-        super(c,r,colour,'Q', ID);
-        setValue(9);
-    }
+    public Queen (char c, char r, String colour) {
+        super("Queen", c,r,colour,'Q',9);
+            }
 }

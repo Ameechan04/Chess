@@ -1,7 +1,9 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public abstract class Piece {
     public char type;
+    public String fname; //fullname
     public char id;
     private boolean alive;
     private String colour;
@@ -9,14 +11,23 @@ public abstract class Piece {
     private char cPos;
     private int value;
 
-    public Piece(char c, char r, String colour, char type, char id) {
-        this.id = id;
+    public Piece(String fname, char c, char r, String colour, char type, int value) {
+       this.fname = fname;
         this.type = type;
         setAlive(true);
         this.cPos = c;
         this.rPos = r;
         setColour(colour);
+        this.value = value;
 
+    }
+
+    public String getFname() {
+        return fname;
+    }
+
+    public void setFname(String fname) {
+        this.fname = fname;
     }
 
     public char getType() {
@@ -174,28 +185,84 @@ public abstract class Piece {
         return true;
     }
 
-    public boolean checkDiagonalUpperRight(ArrayList<Piece> arr, char r, char c) {
-        for (Piece p: arr) {
-            //if same row
-            if (p.getrPos() == r) {
-                //if our current column is left of the piece and our destination is to its right
-                if (this.getcPos() > p.getcPos() && c < p.getcPos()) {
-                    System.out.println("The movement is blocked as a piece is in the way on the left");
-                    return false;
+    public boolean checkPieceInWayDiagonal(ArrayList<Piece> arr, char targetR, char targetC) {
+        //1. find all the spaces in between the targetR and targetC, and the current r and current c
+        char tempC = targetC;
+        char tempR = targetR;
+        int distance = Math.abs(targetR - this.getrPos());
+        char[] betweenRs = new char[distance];
+        char[] betweenCs = new char[distance];
+        int index = 0;
+        for (int i = 0; i < distance; i++) {
+            if (targetR > this.getrPos() && targetC > this.getcPos()) {
+                if ((tempC < targetC && tempR < targetR) && (tempC >= 'A' && tempC <= 'H' && tempR >= '1' && tempR <= '8')) {
+                    betweenRs[index] = tempR;
+                    betweenCs[index] = tempC;
+                    index++;
                 }
+                tempR--;
+                tempC--;
+            } else if (targetR > this.getrPos() && targetC < this.getcPos()) {
+                if ((tempC > targetC && tempR < targetR) && (tempC >= 'A' && tempC <= 'H' && tempR >= '1' && tempR <= '8')) {
+                    betweenRs[index] = tempR;
+                    betweenRs[index] = tempR;
+                    betweenCs[index] = tempC;
+                    index++;
+                }
+                tempR--;
+                tempC++;
+            } else if (targetR < this.getrPos() && targetC > this.getcPos()) {
+                if ((tempC < targetC && tempR > targetR) && (tempC >= 'A' && tempC <= 'H' && tempR >= '1' && tempR <= '8')) {
+                    betweenRs[index] = tempR;
+                    betweenCs[index] = tempC;
+                    index++;
+                }
+                tempR++;
+                tempC--;
+            } else if (targetR < this.getrPos() && targetC < this.getcPos()) {
+                if ((tempC > targetC && tempR > targetR) && (tempC >= 'A' && tempC <= 'H' && tempR >= '1' && tempR <= '8')) {
+                    betweenRs[index] = tempR;
+                    betweenCs[index] = tempC;
+                    index++;
+                }
+                tempR++;
+                tempC++;
             }
         }
+        //2. check if any existing piece is on a flagged square
+
+            for (Piece p : arr) {
+                for (int i = 0; i < betweenCs.length; i++) {
+                    if (p.getrPos() == betweenRs[i] && p.getcPos() == betweenCs[i]) {
+                    //    System.out.println("The movement is blocked as a piece is in the way on the intended diagonal");
+                        return false;
+                    }
+                }
+
+            }
         return true;
     }
 
     public boolean checkIsDiagonal(char r, char c) {
 
-        if (Math.abs(c - this.getcPos()) == Math.abs(r - this.getrPos())) {
-            System.out.println("Diagonal is valid");
-            return true;
+        return Math.abs(c - this.getcPos()) == Math.abs(r - this.getrPos());
+    }
+    public boolean attack(char c, char r, ArrayList<Piece> arr) {
+        if (this.getColour().equals(arr.getFirst().getColour())) {
+            return false;
         }
-        System.out.println("invalid diagonal");
+        //opposite colour
+        int index = 0;
+        for (Piece p : arr) {
+            if(p.getcPos() == c && p.getrPos() == r) {
+                System.out.println("The " + this.getType() + " has killed the " + p.getType());
+                p.killed(arr,index);
+
+                return true;
+            }
+        }
         return false;
+
     }
 
 
