@@ -46,9 +46,15 @@ public abstract class Piece {
 
 
     public boolean killed(ArrayList<Piece> arr, int index) {
-        System.out.println(this.getColour() + " " + this.getType() + " has been killed");
+        Piece p = arr.get(index);
+        System.out.println(arr.get(index).getColour() + " " + arr.get(index).getFname() + " has been killed");
         this.setAlive(false);
         arr.remove(index);
+        for (Piece piece : arr) {
+            if (piece == p) {
+                return false;
+            }
+        }
         return true;
     }
 
@@ -248,6 +254,8 @@ public abstract class Piece {
         return Math.abs(c - this.getcPos()) == Math.abs(r - this.getrPos());
     }
     public boolean attack(char c, char r, ArrayList<Piece> arr) {
+        /*
+        //if the piece to attack equals the same as the arrays first element, it is the same colour and cannot attack
         if (this.getColour().equals(arr.getFirst().getColour())) {
             return false;
         }
@@ -261,6 +269,25 @@ public abstract class Piece {
                 return true;
             }
         }
+
+         */
+
+        //if the column is one left or right AND the row is in front
+        //System.out.println("ATTACK?");
+        int index = 0;
+        if (this.getColour().equals(arr.getFirst().getColour())) {
+            return false;
+        }
+
+            for (Piece piece:arr) {
+                if (piece.getcPos() == c && piece.getrPos() == r) {
+                    System.out.println("The " + this.getType() + " has killed the " + piece.getType());
+                    killed(arr, index);
+                    return true;
+                }
+                index++;
+            }
+
         return false;
 
     }

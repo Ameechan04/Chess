@@ -56,14 +56,10 @@ public class Game {
     }
 
     public void printChess(){
-        System.out.println("┏━━━┓┏┓━━━━━━━━━━━━━━\n" +
-                "┃┏━┓┃┃┃━━━━━━━━━━━━━━\n" +
-                "┃┃━┗┛┃┗━┓┏━━┓┏━━┓┏━━┓\n" +
-                "┃┃━┏┓┃┏┓┃┃┏┓┃┃━━┫┃━━┫\n" +
-                "┃┗━┛┃┃┃┃┃┃┃━┫┣━━┃┣━━┃\n" +
-                "┗━━━┛┗┛┗┛┗━━┛┗━━┛┗━━┛\n" +
-                "━━━━━━━━━━━━━━━━━━━━━\n" +
-                "━━━━━━━━━━━━━━━━━━━━━\n");
+        System.out.println(" ___  _ _  ___  ___  ___ \n" +
+                "|  _]| | || __]/ __]/ __]\n" +
+                "| [__|   || _] \\__ \\\\__ \\\n" +
+                "`___/|_|_||___][___/[___/\n");
 
         System.out.println("         _                                        \n" +
                 "|_ \\/   |_| _  _|  _ _       |V| _  _  _ |_  _  _ \n" +
@@ -79,7 +75,6 @@ public class Game {
         boolean valid = false;
         char C = '0';
         char R = '0';
-
         do {
             System.out.println(ANSI_BLUE + "Enter where you want to move the " + piece.getColour() + " " + piece.getFname() + " e.g. A4");
             location = input.nextLine();
@@ -147,7 +142,10 @@ public class Game {
         turn++;
         boolean endTurn = false;
         String location;
-        char type = '0';
+
+        char existingC = '#';
+        char existingR = '#';
+
        do {
            do {
                System.out.println(ANSI_BLUE + "Enter the location of the piece you want to move e.g A1");
@@ -163,30 +161,34 @@ public class Game {
                if (location.length() != 2) {
                    System.out.println(ANSI_RED + "The location was an invalid format: only enter the letter and the number");
                    valid = false;
-               }
-               char existingC = location.charAt(0);
-               char existingR = location.charAt(1);
-               if (existingC < 'A' || existingC > 'H' || existingR < '1' || existingR > '8') {
-                   System.out.println("Enter a column from A to H and a row from 1 to 8");
-                   System.out.print(ANSI_RESET);
-                   valid = false;
-               }
-               if (player.getColour().equals("white")) {
-                 for(Piece whiteP:board.getWhitePieces()){
-                   if (whiteP.getcPos() == existingC && whiteP.getrPos() == existingR) {
-                       piece = whiteP;
-                //       System.out.println("Moving the white " + piece.getFname() + ":");
-                       valid = true;
-                   }
-                 }
                } else {
-                   for(Piece blackP:board.getBlackPieces()){
-                       if (blackP.getcPos() == existingC && blackP.getrPos() == existingR) {
-                           piece = blackP;
-//                           System.out.println("Moving the black " + piece.getFname() + ":");
-                           valid = true;
-                       }
+                   existingC = location.charAt(0);
+                   existingR = location.charAt(1);
+                   if (existingC < 'A' || existingC > 'H' || existingR < '1' || existingR > '8') {
+                       System.out.println("Enter a column from A to H and a row from 1 to 8");
+                       System.out.print(ANSI_RESET);
+                       valid = false;
+                   } else {
+                       if (player.getColour().equals("white")) {
+                           for(Piece whiteP:board.getWhitePieces()){
+                               if (whiteP.getcPos() == existingC && whiteP.getrPos() == existingR) {
+                                   piece = whiteP;
+                                   valid = true;
+                               }
+                           }
+                       } else {
+                           for(Piece blackP:board.getBlackPieces()){
+                               if (blackP.getcPos() == existingC && blackP.getrPos() == existingR) {
+                                   piece = blackP;
+                                   valid = true;
+                               }
+                           }
+
+
                    }
+               }
+
+
 
                }
                if (piece == null) {
