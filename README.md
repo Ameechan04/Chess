@@ -1,6 +1,8 @@
 # Chess
 Still ironing out some final bugs.
 
+At a later point this code will be used in a non-terminal GUI version.
+
 TO RUN:
 1. download source folder
 2. open IDE e.g. IntelliJ or Eclipse
