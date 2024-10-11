@@ -2,24 +2,35 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public abstract class Piece {
-    public char type;
-    public String fname; //fullname
-    public char id;
+    private char type;
+    private String fname; //fullname
     private boolean alive;
     private String colour;
     private char rPos;
     private char cPos;
     private int value;
+   public ArrayList<String> pieceZoneSquares;
+
+    private ArrayList<String> legalMoves;
 
     public Piece(String fname, char c, char r, String colour, char type, int value) {
-       this.fname = fname;
+        this.fname = fname;
         this.type = type;
         setAlive(true);
         this.cPos = c;
         this.rPos = r;
         setColour(colour);
         this.value = value;
+        legalMoves = new ArrayList<String>();
 
+    }
+
+    public ArrayList<String> getLegalMoves() {
+        return legalMoves;
+    }
+
+    public void setLegalMoves(ArrayList<String> legalMoves) {
+        this.legalMoves = legalMoves;
     }
 
     public String getFname() {
@@ -39,10 +50,9 @@ public abstract class Piece {
     }
 
 
-     public boolean move(char c, char r, ArrayList<Piece> whiteP, ArrayList<Piece> blackP){
+    public boolean move(char c, char r, ArrayList<Piece> whiteP, ArrayList<Piece> blackP) {
         return false;
     }
-
 
 
     public boolean killed(ArrayList<Piece> arr, int index) {
@@ -57,7 +67,6 @@ public abstract class Piece {
         }
         return true;
     }
-
 
 
     public boolean isAlive() {
@@ -100,17 +109,9 @@ public abstract class Piece {
         this.value = value;
     }
 
-    public char getId() {
-        return id;
-    }
-
-    public void setId(char id) {
-        this.id = id;
-    }
-
     public void printInfo() {
 
-        System.out.println(type + " " + value + " alive: " + alive + " black: " + colour + " Position: " + cPos + rPos) ;
+        System.out.println(type + " " + value + " alive: " + alive + " black: " + colour + " Position: " + cPos + rPos);
     }
 
     public boolean moveOnGrid(char c, char r) {
@@ -118,19 +119,17 @@ public abstract class Piece {
         if (c >= 'A' && c <= 'H' && r >= '1' && r <= '8') {
             return true;
         }
-        System.out.println("Move is off the board");
         return false;
     }
 
 
-
     public boolean isSpotEmpty(ArrayList<Piece> whitePieces, ArrayList<Piece> blackPieces, char moveToC, char moveToR) {
-        for (Piece whitePiece:whitePieces) {
+        for (Piece whitePiece : whitePieces) {
             if (whitePiece.getrPos() == moveToR && whitePiece.getcPos() == moveToC) {
                 return false;
             }
         }
-        for (Piece blackPiece:blackPieces) {
+        for (Piece blackPiece : blackPieces) {
             if (blackPiece.getrPos() == moveToR && blackPiece.getcPos() == moveToC) {
                 return false;
             }
@@ -142,21 +141,20 @@ public abstract class Piece {
 
 
     public boolean checkRowAbove(ArrayList<Piece> arr, char r, char c) {
-        for (Piece p: arr) {
-             if (p.getcPos() == c) {
+        for (Piece p : arr) {
+            if (p.getcPos() == c) {
                 if (this.getrPos() < p.getrPos() && r > p.getrPos()) {
-                    System.out.println("The movement is blocked as a piece is above it");
                     return false;
                 }
             }
         }
         return true;
     }
+
     public boolean checkRowBelow(ArrayList<Piece> arr, char r, char c) {
-        for (Piece p: arr) {
+        for (Piece p : arr) {
             if (p.getcPos() == c) {
                 if (this.getrPos() > p.getrPos() && r < p.getrPos()) {
-                    System.out.println("The movement is blocked as a piece is below it");
                     return false;
                 }
             }
@@ -165,30 +163,34 @@ public abstract class Piece {
     }
 
     public boolean checkColumnRight(ArrayList<Piece> arr, char r, char c) {
-        for (Piece p: arr) {
+        for (Piece p : arr) {
             //if same row
             if (p.getrPos() == r) {
                 //if our current column is left of the piece and our destination is to its right
                 if (this.getcPos() < p.getcPos() && c > p.getcPos()) {
-                    System.out.println("The movement is blocked as a piece is in the way on the right");
                     return false;
                 }
             }
         }
         return true;
     }
+
     public boolean checkColumnLeft(ArrayList<Piece> arr, char r, char c) {
-        for (Piece p: arr) {
+        for (Piece p : arr) {
             //if same row
             if (p.getrPos() == r) {
                 //if our current column is left of the piece and our destination is to its right
                 if (this.getcPos() > p.getcPos() && c < p.getcPos()) {
-                    System.out.println("The movement is blocked as a piece is in the way on the left");
                     return false;
                 }
             }
         }
         return true;
+    }
+
+    public boolean checkPieceInWayStraight(ArrayList<Piece> arr, char c, char r) {
+        return checkColumnLeft(arr, r, c) && checkColumnRight(arr, r, c) && checkRowAbove(arr, r, c) && checkRowBelow(arr, r, c);
+
     }
 
     public boolean checkPieceInWayDiagonal(ArrayList<Piece> arr, char targetR, char targetC) {
@@ -237,15 +239,15 @@ public abstract class Piece {
         }
         //2. check if any existing piece is on a flagged square
 
-            for (Piece p : arr) {
-                for (int i = 0; i < betweenCs.length; i++) {
-                    if (p.getrPos() == betweenRs[i] && p.getcPos() == betweenCs[i]) {
+        for (Piece p : arr) {
+            for (int i = 0; i < betweenCs.length; i++) {
+                if (p.getrPos() == betweenRs[i] && p.getcPos() == betweenCs[i]) {
                     //    System.out.println("The movement is blocked as a piece is in the way on the intended diagonal");
-                        return false;
-                    }
+                    return false;
                 }
-
             }
+
+        }
         return true;
     }
 
@@ -253,45 +255,155 @@ public abstract class Piece {
 
         return Math.abs(c - this.getcPos()) == Math.abs(r - this.getrPos());
     }
+
     public boolean attack(char c, char r, ArrayList<Piece> arr) {
-        /*
-        //if the piece to attack equals the same as the arrays first element, it is the same colour and cannot attack
+        int index = 0;
         if (this.getColour().equals(arr.getFirst().getColour())) {
             return false;
         }
-        //opposite colour
-        int index = 0;
-        for (Piece p : arr) {
-            if(p.getcPos() == c && p.getrPos() == r) {
-                System.out.println("The " + this.getType() + " has killed the " + p.getType());
-                p.killed(arr,index);
 
+        for (Piece piece : arr) {
+            if (piece.getcPos() == c && piece.getrPos() == r) {
+                System.out.println("The " + this.getFname() + " has killed the " + piece.getFname());
+                killed(arr, index);
                 return true;
             }
+            index++;
         }
-
-         */
-
-        //if the column is one left or right AND the row is in front
-        //System.out.println("ATTACK?");
-        int index = 0;
-        if (this.getColour().equals(arr.getFirst().getColour())) {
-            return false;
-        }
-
-            for (Piece piece:arr) {
-                if (piece.getcPos() == c && piece.getrPos() == r) {
-                    System.out.println("The " + this.getType() + " has killed the " + piece.getType());
-                    killed(arr, index);
-                    return true;
-                }
-                index++;
-            }
 
         return false;
 
     }
 
+    public ArrayList<String> legalMoves(ArrayList<Piece> whiteP, ArrayList<Piece> blackP, boolean zoneMode) {
+        ArrayList<String> legalMoves = new ArrayList<>();
+        for (char c = 'A'; c < 'J'; c++) {
+            for (char r = '1'; r < '9'; r++) {
+                if (addToLegalMove(c, r, whiteP, blackP,zoneMode)) {
+                    // System.out.println("LEGAL MOVE ADDED");
+                    legalMoves.add(c + "" + r);
+                }
+            }
+        }
+        return legalMoves;
+    }
+
+    public boolean addToLegalMove(char c, char r, ArrayList<Piece> whiteP, ArrayList<Piece> blackP, boolean zoneMode) {
+        System.out.println("Should have been overridden");
+        return false;
+    }
+
+    public boolean attackingKing(ArrayList<String> legalMoves, ArrayList<Piece> whiteP, ArrayList<Piece> blackP) {
+        char c, r;
+
+        for (String l : legalMoves) {
+            c = l.charAt(0);
+            r = l.charAt(1);
+            if (this.getColour().equals("black")) {
+                for (Piece w : whiteP) {
+                    if (w.getrPos() == r && w.getcPos() == c && w.getFname().equals("King")) {
+                        //in check
+                        System.out.println("The white king is in check");
+                        return true;
+                    }
+
+
+                }
+            } else {
+                for (Piece b : blackP) {
+                    if (b.getrPos() == r && b.getcPos() == c && b.getFname().equals("King")) {
+                        //in check
+                        System.out.println("The black king is in check");
+                        return true;
+                    }
+
+
+                }
+
+            }
+
+        }
+        return false;
+
+
+    }
+
+    public King getKing(ArrayList<Piece> whiteP, ArrayList<Piece> blackP) {
+
+        if (this.getColour().equals("white")) {
+            for (Piece p : blackP) {
+                if (p.getFname().equals("King")) {
+                    return (King) p;
+                }
+            }
+        } else {
+            for (Piece p : whiteP) {
+                if (p.getFname().equals("King")) {
+                    return (King) p;
+                }
+            }
+
+        }
+
+        return null;
+
+    }
+
+
+    //to be overridden
+     abstract void addInitialZones(ArrayList<Piece> whiteP, ArrayList<Piece> blackP);
+
+    public boolean removeSelfZone() {
+        int index = 0;
+        for (String z: pieceZoneSquares) {
+            if (z.equals(this.getcPos() + "" + this.getrPos())) {
+                break;
+            }
+            index++;
+        }
+        if (index >= pieceZoneSquares.size()) {
+            return false;
+        }
+        pieceZoneSquares.remove(index);
+        return true;
+    }
+
+    public boolean spotChecker(ArrayList<Piece> whiteP, ArrayList<Piece> blackP, char c, char r, boolean zoneMode) {
+
+        if (!isSpotEmpty(whiteP, blackP, c, r)) {
+
+            if (this.getColour().equals("white")) {
+                for (Piece b : blackP) {
+                    if (b.getcPos() == c && b.getrPos() == r) {
+                        return true;
+                    } else return zoneMode;
+                }
+
+
+            } else {
+                for (Piece w : whiteP) {
+                    if (w.getcPos() == c && w.getrPos() == r) {
+                        return true;
+                    } else return zoneMode;
+
+                }
+
+            }
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public void updatePieceZone(ArrayList<Piece> whiteP, ArrayList<Piece> blackP) {
+
+        pieceZoneSquares.clear();
+        pieceZoneSquares = legalMoves(whiteP, blackP, true);
+        removeSelfZone();
+
+
+
+    }
 
 
 
@@ -300,3 +412,12 @@ public abstract class Piece {
 
 
 }
+
+
+
+
+
+
+
+
+

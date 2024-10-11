@@ -16,8 +16,15 @@ public class Game {
     }
 
     public void MainMenu(){
+        System.out.print(ANSI_BLUE);
         printChess();
-        System.out.println(ANSI_BLUE +"Enter new for a new game, or exit");
+        System.out.println(" █▄ ▄█ ▄▀▄ █ █▄ █   █▄ ▄█ ██▀ █▄ █ █ █\n" +
+                " █ ▀ █ █▀█ █ █ ▀█   █ ▀ █ █▄▄ █ ▀█ ▀▄█\n");
+        System.out.println(ANSI_BLUE +"OPTIONS:");
+        System.out.println("NEW GAME");
+        System.out.println("CREDITS");
+        System.out.println("EXIT");
+        System.out.print("Enter 'new','exit' or 'credits': ");
         System.out.print(ANSI_RESET);
         String in;
         boolean valid = false;
@@ -30,9 +37,11 @@ public class Game {
                     valid = true;
                     players = new ArrayList<>();
                     System.out.println(ANSI_BLUE +"Enter player 1's name: ");
+                    System.out.print(ANSI_RESET);
                     in = (input.nextLine());
                     players.add(new Player(in, "white"));
                     System.out.println(ANSI_BLUE +"Enter player 2's name: ");
+                    System.out.print(ANSI_RESET);
                     in = (input.nextLine());
                     players.add(new Player(in, "black"));
                     System.out.print(ANSI_RESET);
@@ -61,9 +70,9 @@ public class Game {
                 "| [__|   || _] \\__ \\\\__ \\\n" +
                 "`___/|_|_||___][___/[___/\n");
 
-        System.out.println("         _                                        \n" +
-                "|_ \\/   |_| _  _|  _ _       |V| _  _  _ |_  _  _ \n" +
-                "|_)/    | || |(_| | (/_\\^/   | |(/_(/_(_ | |(_|| |\n");
+         System.out.println("         _                                        \n" +
+                            "|_ \\/   |_| _  _|  _ _       |V| _  _  _ |_  _  _ \n" +
+                            "|_)/    | || |(_| | (/_\\^/   | |(/_(/_(_ | |(_|| |\n");
     }
 
     public static void main(String[] args) {
@@ -128,7 +137,8 @@ public class Game {
             System.out.println("Move failed");
             return false;
         } else {
-
+            //board.addToSquaresAttacked(piece.getColour());
+            //board.printSquaresAttacked();
             return true;
         }
 
@@ -145,9 +155,49 @@ public class Game {
 
         char existingC = '#';
         char existingR = '#';
+        King k = null;
 
        do {
            do {
+
+
+               if (player.getColour().equals("white")) {
+                   for (Piece whiteP : board.getWhitePieces()) {
+                       if (whiteP.getFname().equals("King")) {
+                           k = (King) whiteP;
+                           System.out.println("White king is set as k");
+
+                       }
+                   }
+               } else {
+                   for (Piece blackP : board.getBlackPieces()) {
+                       if (blackP.getFname().equals("King")) {
+                           k = (King) blackP;
+                           System.out.println("Black king is set as k");
+                       }
+                   }
+               }
+                board.checkIfChecked(player.getColour());
+                if (k == null) {
+                    System.err.println("error - the king was null. If you are seeing this then there is a bug");
+                }
+               if (k.isInCheck()) {
+                   System.out.println("The king must be moved out of check!");
+                   /*
+                   if (k.getLegalMoves().isEmpty()) {
+                        System.out.println("The king cannot be moved, CHECKMATE!");
+                        break;
+                    } else {
+                       endTurn = true;
+                       break;
+
+                }
+
+                    */
+               }
+
+
+
                System.out.println(ANSI_BLUE + "Enter the location of the piece you want to move e.g A1");
                System.out.print(ANSI_RESET);
 
@@ -201,6 +251,9 @@ public class Game {
 
 
             if (movePiece(piece)) {
+                board.updateZonesOfControl();
+                board.printZoneOfControls(board.getWhitePieces());
+               // board.printZoneOfControl();
                 endTurn = true;
            } else {
                 System.out.println("Something went wrong...");
@@ -211,21 +264,28 @@ public class Game {
     }
 
     public void newGame() {
+        System.out.println(ANSI_RED + "IF YOU ARE PLAYING IN TERMINAL PLEASE ENTER YES OTHERWISE THE GRAPHICAL DISPLAY WILL NOT WORK");
+        System.out.println(ANSI_BLUE + "Enter y/n");
+        System.out.print(ANSI_RESET);
+        String term = input.nextLine().toLowerCase();
         boolean done = false;
         int who = 0;
         board = new Board();
-
-        do {
-            players.get(who).printDetails();
-            board.printBoard();
-            nextTurn(players.get(who));
-           // who = Math.abs(who - 1);
-            board.updateBoard();
-
-
-
-        } while (!done);
+        {
+            do {
+                players.get(who).printDetails();
+                if (term.equals("y")) {
+                    board.printBoardTerminal();
+                } else{
+                    board.printBoard();
+                }
+                nextTurn(players.get(who));
+                who = Math.abs(who - 1); //THIS LINE ENSURES THE CURRENT PLAYER FLIP FLOPS BETWEEN BLACK AND WHITE
+                board.updateBoard();
+            } while (!done);
+        }
 
     }
+
 
 }

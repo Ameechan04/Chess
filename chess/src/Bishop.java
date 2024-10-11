@@ -4,12 +4,13 @@ public class Bishop  extends Piece{
 
 
         public Bishop(char c, char r, String colour) {
-            super("Bishop",c,r,colour,'B',3);
+            super("Bishop",c,r,colour,'♗',3);
             setValue(3);
         }
 
         public boolean move(char c, char r, ArrayList<Piece> whiteP, ArrayList<Piece> blackP) {
             if (!moveOnGrid(c, r)) {
+                System.out.println("Move is off the board");
                 return false;
             }
 
@@ -35,7 +36,7 @@ public class Bishop  extends Piece{
                if (attack(c, r, whiteP) || attack(c,r,blackP)) {
                     setcPos(c);
                     setrPos(r);
-                    System.out.println("The " + this.type + " has been moved to " + this.getcPos() + this.getrPos());
+                    System.out.println("The " + this.getFname() + " has been moved to " + this.getcPos() + this.getrPos());
                     return true;
                 }
                 System.out.println("The spot is already taken!");
@@ -44,11 +45,36 @@ public class Bishop  extends Piece{
             } else {
                 setcPos(c);
                 setrPos(r);
-                System.out.println("The piece has been moved to " + this.getcPos() + this.getrPos());
+                System.out.println("The bishop has been moved to " + this.getcPos() + this.getrPos());
                 return true;
             }
         }
 
+    @Override
+    public boolean addToLegalMove(char c, char r, ArrayList<Piece> whiteP, ArrayList<Piece> blackP, boolean zoneMode) {
+        if (!moveOnGrid(c, r)) {
+
+            return false;
+        }
+
+        //can only move in diagonal lines
+        if (!(c != this.getcPos() && r != this.getrPos()) || !checkIsDiagonal(r, c)) {
+            //moving in a not diagonal
+            return false;
+        }
+        if (!checkPieceInWayDiagonal(whiteP,r,c) || !checkPieceInWayDiagonal(blackP,r,c)) {
+            return false;
+        }
+
+        return spotChecker(whiteP, blackP, c, r, zoneMode);
+    }
+
+
+    @Override
+    public void addInitialZones(ArrayList<Piece> whiteP, ArrayList<Piece> blackP) {
+        pieceZoneSquares = legalMoves(whiteP, blackP, true);
+        removeSelfZone();
+    }
 
 
     }
